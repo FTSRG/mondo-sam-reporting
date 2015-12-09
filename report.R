@@ -21,6 +21,7 @@ results = read.csv("results.csv")
 
 # filtering for time values
 times = subset(results, Metric == "Time")
+times = subset(times, Phase == "Read" | Phase == "Check")
 
 # convert nanoseconds to seconds
 times$Value = times$Value / 10^9

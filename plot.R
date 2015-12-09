@@ -21,10 +21,12 @@ benchmark.plot = function(df, scenario, artifacts, title, facet, scale, ncol, wi
 
   facet = as.formula(paste("~", facet))
 
+  print(unique(df$Tool))
+  
   p = ggplot(df) +
     labs(title = paste(scenario, " scenario, ", title, sep = ""), x = "model size\n#triples", y = "execution time [s]") +
     geom_point(aes(x = as.factor(Artifact), y = time, col = Tool, shape = Tool), size = 1.5) +
-    geom_line(aes(x = as.factor(Artifact), y = time, col = Tool, group = Tool), size = 0.15) +
+    geom_line(aes(x = as.factor(Artifact), y = time, col = Tool, group = Tool), size = 0.5) +
     scale_shape_manual(values = seq(0,24)) +
     scale_x_discrete(breaks = xbreaks, labels = xlabels) +
     scale_y_log10(breaks = ybreaks, labels = ylabels) +
