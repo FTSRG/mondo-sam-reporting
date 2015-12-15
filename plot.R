@@ -25,9 +25,9 @@ benchmark.plot = function(df, scenario, modelsizes, title, facet, scale, ncol, w
     scale_y_log10(breaks = ybreaks, labels = ylabels) +
     facet_wrap(facet, ncol = 2, scale = scale) +
     theme_bw() +
-    theme(legend.key = element_blank(), legend.title = element_blank(), legend.position = "bottom", axis.text = element_text(size = 9))
+    theme(legend.key = element_blank(), legend.title = element_blank(), legend.position = "bottom", axis.text = element_text(size = 9.5))
   print(p)
-  ggsave(file = paste("diagrams/", scenario, "-", plot.filename, ".pdf", sep = ""), width = width, height = height, units = "mm")
+  ggsave(file = paste("diagrams/", scenario, "-", plot.filename, ".png", sep = ""), width = width, height = height, units = "mm")
 }
 
 benchmark.plot.by.phase = function(df, scenario, modelsizes, levels, case, title, ncol = 2) {
