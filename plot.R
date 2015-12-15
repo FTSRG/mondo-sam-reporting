@@ -23,7 +23,7 @@ benchmark.plot = function(df, scenario, artifacts, title, facet, scale, ncol, wi
   facet = as.formula(paste("~", facet))
   
   p = ggplot(df) +
-    labs(title = paste(scenario, " scenario, ", title, sep = ""), x = "model size\nnumber of model elements", y = "execution time [s]") +
+    labs(title = paste(scenario, " scenario, ", title, sep = ""), x = "Model size\nNumber of model elements", y = "Execution time [s]") +
     geom_point(aes(x = as.factor(Artifact), y = time, col = Tool, shape = Tool), size = 1.5) +
     geom_line(aes(x = as.factor(Artifact), y = time, col = Tool, group = Tool), size = 0.4) +
     scale_shape_manual(values = seq(0,24)) +
@@ -31,8 +31,7 @@ benchmark.plot = function(df, scenario, artifacts, title, facet, scale, ncol, wi
     scale_y_log10(breaks = ybreaks, labels = ylabels) +
     facet_wrap(facet, ncol = ncol, scale = scale) +
     theme_bw() +
-    theme(legend.key = element_blank(), legend.title = element_blank(), legend.position = "bottom") + #, axis.text.x = element_text(size=8)) +
-    guides(shape = guide_legend(ncol = 2))
+    theme(legend.key = element_blank(), legend.title = element_blank(), legend.position = "bottom")
   print(p)
   
   ggsave(file = paste("diagrams/", scenario, "-", plot.filename, ".pdf", sep = ""), width = width, height = height, units = "mm")

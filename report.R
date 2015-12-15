@@ -25,15 +25,15 @@ results = subset(results, Case != "PosLength" & Case != "SwitchSensor")
 # filtering for time values
 times = subset(results, Metric == "time")
 
+# convert nanoseconds to seconds
+times$Value = times$Value / 10^9
+
 times.wide = dcast(times,
                    Scenario + Tool + Run + Case + Artifact + Metric ~ Phase,
                    value.var = "Value")
-#xtable(times.wide)
 
-# convert nanoseconds to seconds
-times$Value = times$Value / 10^9
 # replace underscore with space in tool names
-times$Tool = gsub('_', ' ', times$Tool)
+#times$Tool = gsub('_', ' ', times$Tool)
 
 # transform long table to wide table
 times.plot = times
@@ -48,10 +48,12 @@ modelsizes = do.call(rbind, list(modelsizes.repair))
 #levels.cases = c("PosLength", "SwitchSensor")
 levels.cases = c("RouteSensor", "SwitchSet", "ConnectedSegments", "SemaphoreNeighbor")
 
+times.plot
 benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "read", "read phase")
-benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "check", "check phase")
 benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "createengine", "create engine phase")
-benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "calculatesearchplan", "calculate search phase")
+benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "calculatesearchplan", "calculate search plan phase")
+benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "check", "check phase")
+
 
 #levels.phases = c("read", "check", "createengine", "calculatesearchplan")
 #benchmark.plot.by.phase(times.plot, scenario, modelsizes, "calculatesearchplan", "Calculating search plan")
