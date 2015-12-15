@@ -32,6 +32,9 @@ times.wide = dcast(times,
                    Scenario + Tool + Run + Case + Artifact + Metric ~ Phase,
                    value.var = "Value")
 
+head(times.wide)
+times.wide[check]
+
 # replace underscore with space in tool names
 #times$Tool = gsub('_', ' ', times$Tool)
 
@@ -54,6 +57,6 @@ benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "createen
 benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "calculatesearchplan", "calculate search plan phase")
 benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "check", "check phase")
 
-
 #levels.phases = c("read", "check", "createengine", "calculatesearchplan")
-#benchmark.plot.by.phase(times.plot, scenario, modelsizes, "calculatesearchplan", "Calculating search plan")
+times.parallel = subset(times.plot, Tool == "Parallel")
+benchmark.plot.by.phase(times.parallel, scenario, modelsizes, "calculatesearchplan", "Calculating search plan")
