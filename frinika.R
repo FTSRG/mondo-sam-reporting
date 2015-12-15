@@ -7,7 +7,11 @@ ylabels = parse(text = paste("10^", ys, sep = ""))
 df = read.csv("ls2.csv")
 #df$Value = df$Value / 10^9
 df[df == 0] = NA
-ggplot(data=df, aes(x=Tool, y=Value, fill=Phase)) +
+
+levels=c("model load", "engine creation", "search plan calculation", "check")
+df$Phase = factor(df$Phase, levels = levels)
+
+ggplot(data=df, aes(x=Tool, y=Value, fill=Phase,order=order)) +
     geom_bar(stat="identity", position="dodge") +
     facet_wrap(~ Case, ncol=4) +
     theme_bw() +
