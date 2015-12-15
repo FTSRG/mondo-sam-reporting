@@ -9,9 +9,15 @@ df$Value = df$Value / 10^9
 
 df = arrange(df, Artifact, Case, Phase)
 
-levels = c("Model load", "Engine creation", "Search plan calculation", "Check")
-df$Phase = reorder.factor(df$Phase, new.order=levels)
+phases = c("Model load", "Engine creation", "Search plan calculation", "Check")
+artifacts = c("Qwicap", "Frinika", "Hibernate")
+
+df$Phase = reorder.factor(df$Phase, new.order=phases)
 df = arrange(df, Phase)
+
+df$Artifact = reorder.factor(df$Artifact, new.order=artifacts)
+df = arrange(df, Artifact)
+
 
 ggplot(data=df, aes(x=Tool, y=Value, fill=Phase)) +
     geom_bar(stat="identity") +
