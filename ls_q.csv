@@ -1,49 +1,49 @@
-Case,Tool,Phase,Value
-Unused parameter,Incremental,model load,81641838
-Unused parameter,Incremental,engine creation,415976108
-Unused parameter,Incremental,search plan calculation,0
-Unused parameter,Incremental,check,1306091
-Unused parameter,Sequential,model load,84642376
-Unused parameter,Sequential,engine creation,105641499
-Unused parameter,Sequential,search plan calculation,144243160
-Unused parameter,Sequential,check,6288344
-Unused parameter,Parallel,model load,91803925
-Unused parameter,Parallel,engine creation,126047992
-Unused parameter,Parallel,search plan calculation,85913884
-Unused parameter,Parallel,check,11997213
-Catch,Incremental,model load,81641838
-Catch,Incremental,engine creation,97183222
-Catch,Incremental,search plan calculation,0
-Catch,Incremental,check,162322
-Catch,Sequential,model load,64297581
-Catch,Sequential,engine creation,67173677
-Catch,Sequential,search plan calculation,10425376
-Catch,Sequential,check,67947
-Catch,Parallel,model load,91803925
-Catch,Parallel,engine creation,31526430
-Catch,Parallel,search plan calculation,7865817
-Catch,Parallel,check,23083
-No default switch,Incremental,model load,77322531
-No default switch,Incremental,engine creation,90726507
-No default switch,Incremental,search plan calculation,0
-No default switch,Incremental,check,144481
-No default switch,Sequential,model load,84642376
-No default switch,Sequential,engine creation,38379746
-No default switch,Sequential,search plan calculation,1350590
-No default switch,Sequential,check,176701
-No default switch,Parallel,model load,82287377
-No default switch,Parallel,engine creation,26461299
-No default switch,Parallel,search plan calculation,1473519
-No default switch,Parallel,check,352822
-Constant compare,Incremental,model load,76133194
-Constant compare,Incremental,engine creation,99075816
-Constant compare,Incremental,search plan calculation,0
-Constant compare,Incremental,check,155396
-Constant compare,Sequential,model load,80301909
-Constant compare,Sequential,engine creation,37008301
-Constant compare,Sequential,search plan calculation,23460019
-Constant compare,Sequential,check,655508
-Constant compare,Parallel,model load,80502025
-Constant compare,Parallel,engine creation,24669703
-Constant compare,Parallel,search plan calculation,24527040
-Constant compare,Parallel,check,1403865
+Artifact,Case,Tool,Phase,Value
+Qwicap,Unused parameter,Incremental,model load,81641838
+Qwicap,Unused parameter,Incremental,engine creation,415976108
+Qwicap,Unused parameter,Incremental,search plan calculation,0
+Qwicap,Unused parameter,Incremental,check,1306091
+Qwicap,Unused parameter,Sequential,model load,84642376
+Qwicap,Unused parameter,Sequential,engine creation,105641499
+Qwicap,Unused parameter,Sequential,search plan calculation,144243160
+Qwicap,Unused parameter,Sequential,check,6288344
+Qwicap,Unused parameter,Parallel,model load,91803925
+Qwicap,Unused parameter,Parallel,engine creation,126047992
+Qwicap,Unused parameter,Parallel,search plan calculation,85913884
+Qwicap,Unused parameter,Parallel,check,11997213
+Qwicap,Catch,Incremental,model load,81641838
+Qwicap,Catch,Incremental,engine creation,97183222
+Qwicap,Catch,Incremental,search plan calculation,0
+Qwicap,Catch,Incremental,check,162322
+Qwicap,Catch,Sequential,model load,64297581
+Qwicap,Catch,Sequential,engine creation,67173677
+Qwicap,Catch,Sequential,search plan calculation,10425376
+Qwicap,Catch,Sequential,check,67947
+Qwicap,Catch,Parallel,model load,91803925
+Qwicap,Catch,Parallel,engine creation,31526430
+Qwicap,Catch,Parallel,search plan calculation,7865817
+Qwicap,Catch,Parallel,check,23083
+Qwicap,No default switch,Incremental,model load,77322531
+Qwicap,No default switch,Incremental,engine creation,90726507
+Qwicap,No default switch,Incremental,search plan calculation,0
+Qwicap,No default switch,Incremental,check,144481
+Qwicap,No default switch,Sequential,model load,84642376
+Qwicap,No default switch,Sequential,engine creation,38379746
+Qwicap,No default switch,Sequential,search plan calculation,1350590
+Qwicap,No default switch,Sequential,check,176701
+Qwicap,No default switch,Parallel,model load,82287377
+Qwicap,No default switch,Parallel,engine creation,26461299
+Qwicap,No default switch,Parallel,search plan calculation,1473519
+Qwicap,No default switch,Parallel,check,352822
+Qwicap,Constant compare,Incremental,model load,76133194
+Qwicap,Constant compare,Incremental,engine creation,99075816
+Qwicap,Constant compare,Incremental,search plan calculation,0
+Qwicap,Constant compare,Incremental,check,155396
+Qwicap,Constant compare,Sequential,model load,80301909
+Qwicap,Constant compare,Sequential,engine creation,37008301
+Qwicap,Constant compare,Sequential,search plan calculation,23460019
+Qwicap,Constant compare,Sequential,check,655508
+Qwicap,Constant compare,Parallel,model load,80502025
+Qwicap,Constant compare,Parallel,engine creation,24669703
+Qwicap,Constant compare,Parallel,search plan calculation,24527040
+Qwicap,Constant compare,Parallel,check,1403865
