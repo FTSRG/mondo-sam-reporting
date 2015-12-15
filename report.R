@@ -20,6 +20,8 @@ source("plot.R")
 
 results = read.csv("results.csv")
 
+results = subset(results, Case != "PosLength" & Case != "SwitchSensor")
+
 # filtering for time values
 times = subset(results, Metric == "time")
 
@@ -43,7 +45,8 @@ scenario = "Batch"
 modelsizes.repair = data.frame(Scenario = "Batch", Artifact = 2^(0:14), Triples = c("4.9k", "9.3k", "19.8k", "44.5k", "85.4k", "191.1k", "372.1k", "750.7k", "1.5M", "2.9M", "5.8M", "11.5M", "23.2M", "46.4M", "92.8M"))
 modelsizes = do.call(rbind, list(modelsizes.repair))
 
-levels.cases = c("PosLength", "SwitchSensor", "RouteSensor", "SwitchSet", "ConnectedSegments", "SemaphoreNeighbor")
+#levels.cases = c("PosLength", "SwitchSensor")
+levels.cases = c("RouteSensor", "SwitchSet", "ConnectedSegments", "SemaphoreNeighbor")
 
 benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "read", "read phase")
 benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "check", "check phase")
@@ -51,4 +54,4 @@ benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "createen
 benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "calculatesearchplan", "calculate search phase")
 
 #levels.phases = c("read", "check", "createengine", "calculatesearchplan")
-benchmark.plot.by.phase(times.plot, scenario, modelsizes, "calculatesearchplan", "Calculating search plan")
+#benchmark.plot.by.phase(times.plot, scenario, modelsizes, "calculatesearchplan", "Calculating search plan")
