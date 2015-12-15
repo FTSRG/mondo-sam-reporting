@@ -51,7 +51,6 @@ modelsizes = do.call(rbind, list(modelsizes.repair))
 #levels.cases = c("PosLength", "SwitchSensor")
 levels.cases = c("RouteSensor", "SwitchSet", "ConnectedSegments", "SemaphoreNeighbor")
 
-times.plot
 benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "read", "read phase")
 benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "createengine", "create engine phase")
 benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "calculatesearchplan", "calculate search plan phase")
