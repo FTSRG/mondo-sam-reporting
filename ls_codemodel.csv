@@ -1,0 +1,145 @@
+Artifact,Case,Tool,Phase,Value
+Frinika,Catch,Incremental,Check,1705937
+Frinika,Catch,Incremental,Engine creation,1813004376
+Frinika,Catch,Incremental,Model load,2535459344
+Frinika,Catch,Incremental,Search plan calculation,0
+Frinika,Catch,Parallel,Check,815037
+Frinika,Catch,Parallel,Engine creation,854672770
+Frinika,Catch,Parallel,Model load,2574996407
+Frinika,Catch,Parallel,Search plan calculation,406483707
+Frinika,Catch,Sequential,Check,906343
+Frinika,Catch,Sequential,Engine creation,841721629
+Frinika,Catch,Sequential,Model load,2512000219
+Frinika,Catch,Sequential,Search plan calculation,399800118
+Frinika,Constant compare,Incremental,Check,1416934
+Frinika,Constant compare,Incremental,Engine creation,1905576209
+Frinika,Constant compare,Incremental,Model load,2448428101
+Frinika,Constant compare,Incremental,Search plan calculation,0
+Frinika,Constant compare,Parallel,Check,5169965
+Frinika,Constant compare,Parallel,Engine creation,836720453
+Frinika,Constant compare,Parallel,Model load,2529477826
+Frinika,Constant compare,Parallel,Search plan calculation,684743035
+Frinika,Constant compare,Sequential,Check,8098769
+Frinika,Constant compare,Sequential,Engine creation,867095951
+Frinika,Constant compare,Sequential,Model load,2385321182
+Frinika,Constant compare,Sequential,Search plan calculation,574927470
+Frinika,No default switch,Incremental,Check,868356
+Frinika,No default switch,Incremental,Engine creation,1627905383
+Frinika,No default switch,Incremental,Model load,2534676520
+Frinika,No default switch,Incremental,Search plan calculation,0
+Frinika,No default switch,Parallel,Check,705056
+Frinika,No default switch,Parallel,Engine creation,851020151
+Frinika,No default switch,Parallel,Model load,2485023837
+Frinika,No default switch,Parallel,Search plan calculation,1038085
+Frinika,No default switch,Sequential,Check,489701
+Frinika,No default switch,Sequential,Engine creation,839560756
+Frinika,No default switch,Sequential,Model load,2394891870
+Frinika,No default switch,Sequential,Search plan calculation,707996
+Frinika,Unused parameter,Incremental,Check,2417812
+Frinika,Unused parameter,Incremental,Engine creation,3104895587
+Frinika,Unused parameter,Incremental,Model load,2448428101
+Frinika,Unused parameter,Incremental,Search plan calculation,0
+Frinika,Unused parameter,Parallel,Check,71081296
+Frinika,Unused parameter,Parallel,Engine creation,989021566
+Frinika,Unused parameter,Parallel,Model load,2529477826
+Frinika,Unused parameter,Parallel,Search plan calculation,2349976363
+Frinika,Unused parameter,Sequential,Check,75691445
+Frinika,Unused parameter,Sequential,Engine creation,912260455
+Frinika,Unused parameter,Sequential,Model load,2385321182
+Frinika,Unused parameter,Sequential,Search plan calculation,2283327888
+Hibernate,Catch,Incremental,Model load,17858026495
+Hibernate,Catch,Incremental,Engine creation,10587933993
+Hibernate,Catch,Incremental,Search plan calculation,0
+Hibernate,Catch,Incremental,Check,186668
+Hibernate,Catch,Sequential,Model load,16377468824
+Hibernate,Catch,Sequential,Engine creation,4758025717
+Hibernate,Catch,Sequential,Search plan calculation,2646911897
+Hibernate,Catch,Sequential,Check,1980415
+Hibernate,Catch,Parallel,Model load,16671170418
+Hibernate,Catch,Parallel,Engine creation,4924971355
+Hibernate,Catch,Parallel,Search plan calculation,2697898264
+Hibernate,Catch,Parallel,Check,1770571
+Hibernate,No default switch,Incremental,Model load,17647664754
+Hibernate,No default switch,Incremental,Engine creation,9166195785
+Hibernate,No default switch,Incremental,Search plan calculation,0
+Hibernate,No default switch,Incremental,Check,216186
+Hibernate,No default switch,Sequential,Model load,16986683452
+Hibernate,No default switch,Sequential,Engine creation,4887606854
+Hibernate,No default switch,Sequential,Search plan calculation,833888
+Hibernate,No default switch,Sequential,Check,314701
+Hibernate,No default switch,Parallel,Model load,16619896519
+Hibernate,No default switch,Parallel,Engine creation,4682633189
+Hibernate,No default switch,Parallel,Search plan calculation,688905
+Hibernate,No default switch,Parallel,Check,719915
+Hibernate,Constant compare,Incremental,Model load,16854273915
+Hibernate,Constant compare,Incremental,Engine creation,11407826704
+Hibernate,Constant compare,Incremental,Search plan calculation,0
+Hibernate,Constant compare,Incremental,Check,686360
+Hibernate,Constant compare,Sequential,Model load,17903458652
+Hibernate,Constant compare,Sequential,Engine creation,5101105326
+Hibernate,Constant compare,Sequential,Search plan calculation,7730144230
+Hibernate,Constant compare,Sequential,Check,58819523
+Hibernate,Constant compare,Parallel,Model load,16887167149
+Hibernate,Constant compare,Parallel,Engine creation,5018546244
+Hibernate,Constant compare,Parallel,Search plan calculation,4569996073
+Hibernate,Constant compare,Parallel,Check,188768290
+Hibernate,Unused parameter,Incremental,Model load,16748052785
+Hibernate,Unused parameter,Incremental,Engine creation,12785289207
+Hibernate,Unused parameter,Incremental,Search plan calculation,0
+Hibernate,Unused parameter,Incremental,Check,769448
+Hibernate,Unused parameter,Sequential,Model load,15965078758
+Hibernate,Unused parameter,Sequential,Engine creation,4938662988
+Hibernate,Unused parameter,Sequential,Search plan calculation,10557076594
+Hibernate,Unused parameter,Sequential,Check,263211053
+Hibernate,Unused parameter,Parallel,Model load,16796317896
+Hibernate,Unused parameter,Parallel,Engine creation,4702247830
+Hibernate,Unused parameter,Parallel,Search plan calculation,9958879064
+Hibernate,Unused parameter,Parallel,Check,232611962
+Qwicap,Unused parameter,Incremental,Model load,81641838
+Qwicap,Unused parameter,Incremental,Engine creation,415976108
+Qwicap,Unused parameter,Incremental,Search plan calculation,0
+Qwicap,Unused parameter,Incremental,Check,1306091
+Qwicap,Unused parameter,Sequential,Model load,84642376
+Qwicap,Unused parameter,Sequential,Engine creation,105641499
+Qwicap,Unused parameter,Sequential,Search plan calculation,144243160
+Qwicap,Unused parameter,Sequential,Check,6288344
+Qwicap,Unused parameter,Parallel,Model load,91803925
+Qwicap,Unused parameter,Parallel,Engine creation,126047992
+Qwicap,Unused parameter,Parallel,Search plan calculation,85913884
+Qwicap,Unused parameter,Parallel,Check,11997213
+Qwicap,Catch,Incremental,Model load,81641838
+Qwicap,Catch,Incremental,Engine creation,97183222
+Qwicap,Catch,Incremental,Search plan calculation,0
+Qwicap,Catch,Incremental,Check,162322
+Qwicap,Catch,Sequential,Model load,64297581
+Qwicap,Catch,Sequential,Engine creation,67173677
+Qwicap,Catch,Sequential,Search plan calculation,10425376
+Qwicap,Catch,Sequential,Check,67947
+Qwicap,Catch,Parallel,Model load,91803925
+Qwicap,Catch,Parallel,Engine creation,31526430
+Qwicap,Catch,Parallel,Search plan calculation,7865817
+Qwicap,Catch,Parallel,Check,23083
+Qwicap,No default switch,Incremental,Model load,77322531
+Qwicap,No default switch,Incremental,Engine creation,90726507
+Qwicap,No default switch,Incremental,Search plan calculation,0
+Qwicap,No default switch,Incremental,Check,144481
+Qwicap,No default switch,Sequential,Model load,84642376
+Qwicap,No default switch,Sequential,Engine creation,38379746
+Qwicap,No default switch,Sequential,Search plan calculation,1350590
+Qwicap,No default switch,Sequential,Check,176701
+Qwicap,No default switch,Parallel,Model load,82287377
+Qwicap,No default switch,Parallel,Engine creation,26461299
+Qwicap,No default switch,Parallel,Search plan calculation,1473519
+Qwicap,No default switch,Parallel,Check,352822
+Qwicap,Constant compare,Incremental,Model load,76133194
+Qwicap,Constant compare,Incremental,Engine creation,99075816
+Qwicap,Constant compare,Incremental,Search plan calculation,0
+Qwicap,Constant compare,Incremental,Check,155396
+Qwicap,Constant compare,Sequential,Model load,80301909
+Qwicap,Constant compare,Sequential,Engine creation,37008301
+Qwicap,Constant compare,Sequential,Search plan calculation,23460019
+Qwicap,Constant compare,Sequential,Check,655508
+Qwicap,Constant compare,Parallel,Model load,80502025
+Qwicap,Constant compare,Parallel,Engine creation,24669703
+Qwicap,Constant compare,Parallel,Search plan calculation,24527040
+Qwicap,Constant compare,Parallel,Check,1403865
