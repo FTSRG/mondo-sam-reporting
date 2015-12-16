@@ -36,7 +36,6 @@ To edit the script, it is recommended to use [RStudio](https://www.rstudio.com/)
 To draw a few simple plots, issue the following command:
 
 ```bash
-./init.sh
 ./report.sh
 ```
 
