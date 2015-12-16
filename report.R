@@ -12,8 +12,8 @@
 # * convert the data to long table which (better suited for visualization)
 # * draw the plots
 
-library("reshape2")
-library("plyr")
+library(reshape2)
+library(plyr)
 
 source("plot.R")
 
@@ -75,17 +75,18 @@ modelsize.repair = data.frame(Scenario = "Repair", Artifact = 2^(0:14), Triples 
 modelsizes = do.call(rbind, list(modelsize.batch, modelsize.inject, modelsize.repair))
 
 # levels for the facets in the plot
-#levels.cases = c("PosLength", "SwitchSensor", "RouteSensor", "SwitchSet", "ConnectedSegments", "SemaphoreNeighbor")
-levels.cases = c("RouteSensor")
+levels.cases = c("PosLength", "SwitchSensor", "RouteSensor", "SwitchSet", "ConnectedSegments", "SemaphoreNeighbor")
+#levels.cases = c("RouteSensor")
 
 scenario = "Repair"
-ncol = 1
+facet_cols = 2
+legend_cols = 4
 
 # draw plots
-benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Read", "read phase", ncol)
-benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Check", "check phase", ncol)
-benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Read and Check", "read and check phase", ncol)
+benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Read", "read phase", facet_cols, legend_cols)
+benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Check", "check phase", facet_cols, legend_cols)
+benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Read and Check", "read and check phase", facet_cols, legend_cols)
 
-benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Transformation", "transformation phase", ncol)
-benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Recheck", "recheck phase", ncol)
-benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Transformation and Recheck", "transformation and recheck phase", ncol)
+benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Transformation", "transformation phase", facet_cols, legend_cols)
+benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Recheck", "recheck phase", facet_cols, legend_cols)
+benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Transformation and Recheck", "transformation and recheck phase", facet_cols, legend_cols)

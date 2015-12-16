@@ -1,6 +1,6 @@
-library("ggplot2")
+library(ggplot2)
 
-benchmark.plot = function(df, scenario, artifacts, title, facet, scale, ncol, width = 210, height = 297) {
+benchmark.plot = function(df, scenario, artifacts, title, facet, scale, facet_cols, legend_cols, width = 210, height = 297) {
   if (ncol > 1) {
     evens = seq(2, nrow(artifacts), by=2)
     artifacts = artifacts[-evens, ]
@@ -28,23 +28,23 @@ benchmark.plot = function(df, scenario, artifacts, title, facet, scale, ncol, wi
     scale_shape_manual(values = seq(0,24)) +
     scale_x_discrete(breaks = xbreaks, labels = xlabels) +
     scale_y_log10(breaks = ybreaks, labels = ylabels) +
-    facet_wrap(facet, ncol = ncol, scale = scale) +
+    facet_wrap(facet, ncol = facet_cols, scale = scale) +
     theme_bw() +
     theme(legend.key = element_blank(), legend.title = element_blank(), legend.position = "bottom") +
-    guides(shape = guide_legend(ncol = 2))
+    guides(shape = guide_legend(ncol = legend_cols))
   print(p)
   
   ggsave(file = paste("diagrams/", scenario, "-", plot.filename, ".pdf", sep = ""), width = width, height = height, units = "mm")
 }
 
-benchmark.plot.by.phase = function(df, scenario, artifacts, levels, case, title, ncol = 2) {
+benchmark.plot.by.phase = function(df, scenario, artifacts, levels, case, title, facet_cols = 2, legend_cols = 2) {
   df = df[df$Scenario == scenario & df$Case == case, ]
   df$Phase = factor(df$Phase, levels = levels)
-  benchmark.plot(df, scenario, artifacts, title, "Phase", "free_y", ncol)
+  benchmark.plot(df, scenario, artifacts, title, "Phase", "free_y", facet_cols, legend_cols)
 }
 
-benchmark.plot.by.case = function(df, scenario, artifacts, levels, phase, title, ncol = 2) {
+benchmark.plot.by.case = function(df, scenario, artifacts, levels, phase, title, facets_cols = 2, legend_cols = 2) {
   df = df[df$Scenario == scenario & df$Phase == phase, ]
   df$Case = factor(df$Case, levels = levels)
-  benchmark.plot(df, scenario, artifacts, title, "Case", "fixed", ncol)
+  benchmark.plot(df, scenario, artifacts, title, "Case", "fixed", facet_cols, legend_cols)
 }
