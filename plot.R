@@ -1,7 +1,8 @@
 library(ggplot2)
 
 benchmark.plot = function(df, scenario, artifacts, title, facet, scale, facet_cols, legend_cols, width = 210, height = 297) {
-  if (ncol > 1) {
+  # for multicolumn layouts, we omit every second label on the x axis
+  if (facet_cols > 1) {
     evens = seq(2, nrow(artifacts), by=2)
     artifacts = artifacts[-evens, ]
   }

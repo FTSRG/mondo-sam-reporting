@@ -39,6 +39,7 @@ times.derived$Read.and.Check = times.derived$Read + times.derived$Check
 times.derived$Transformation.and.Recheck = times.derived$Transformation + times.derived$Recheck
 
 # summarize for each value (along the **Iteration** attribute) using a columnwise function
+# there might be NAs as some phases (e.g. Read) are not executed repeatedly
 times.aggregated.iterations = ddply(
   .data = times.derived,
   .variables = c("Scenario", "Tool", "Run", "Case", "Artifact", "Metric"),
@@ -76,7 +77,6 @@ modelsizes = do.call(rbind, list(modelsize.batch, modelsize.inject, modelsize.re
 
 # levels for the facets in the plot
 levels.cases = c("PosLength", "SwitchSensor", "RouteSensor", "SwitchSet", "ConnectedSegments", "SemaphoreNeighbor")
-#levels.cases = c("RouteSensor")
 
 scenario = "Repair"
 facet_cols = 2
