@@ -21,7 +21,7 @@ results = read.csv("results.csv")
 
 # filtering for time values
 times = subset(results, Metric == "Time")
-times = subset(times, Phase == "Read" | Phase == "Check")
+#times = subset(times, Phase == "Read" | Phase == "Check")
 
 # convert nanoseconds to seconds
 times$Value = times$Value / 10^9
@@ -30,34 +30,39 @@ times$Tool = gsub('_', ' ', times$Tool)
 
 # transform long table to wide table
 times.wide = dcast(times,
-                   Scenario + Tool + Run + Case + Artifact + Metric ~ Phase,
+                   Scenario + Tool + Run + Case + Artifact + Iteration + Metric ~ Phase,
                    value.var = "Value")
 
 # calculate aggregated values
 times.derived = times.wide
 times.derived$Read.and.Check = times.derived$Read + times.derived$Check
+times.derived$Transformation.and.Recheck = times.derived$Transformation + times.derived$Recheck
 
 # summarize for each value (along the **Iteration** attribute) using a columnwise function
-times.aggregated.iteration = ddply(
+times.aggregated.iterations = ddply(
   .data = times.derived,
   .variables = c("Scenario", "Tool", "Run", "Case", "Artifact", "Metric"),
-  .fun = colwise(mean)
+  .fun = colwise(mean, na.rm = TRUE)
 )
+# drop the **Iteration** attribute
+times.aggregated.iterations = subset(times.aggregated.iterations, select=-c(Iteration))
 
-# summarize for each value (along the **Run** attribute) using the fr function
+# summarize for each value (along the **Run** attribute) using a columnwise function
 times.aggregated.runs = ddply(
-  .data = times.aggregated.iteration,
+  .data = times.aggregated.iterations,
   .variables = c("Scenario", "Tool", "Case", "Artifact", "Metric"),
   .fun = colwise(median)
 )
+# drop the **Run** attribute
+times.aggregated.runs = subset(times.aggregated.runs, select=-c(Run))
 
 # melt data to a wide table
 times.plot = melt(
   data = times.aggregated.runs,
   id.vars = c("Scenario", "Tool", "Case", "Artifact", "Metric"),
-  measure.vars = c("Read", "Check", "Read.and.Check"),
+  measure.vars = c("Read", "Check", "Read.and.Check", "Transformation", "Recheck", "Transformation.and.Recheck"),
   variable.name = "Phase",
-  value.name = "time"
+  value.name = "Time"
 )
 
 # remove the . characters from the phasename
@@ -70,10 +75,16 @@ modelsize.repair = data.frame(Scenario = "Repair", Artifact = 2^(0:14), Triples 
 modelsizes = do.call(rbind, list(modelsize.batch, modelsize.inject, modelsize.repair))
 
 # levels for the facets in the plot
-levels.cases = c("RouteSensor", "SwitchSet", "ConnectedSegments", "SemaphoreNeighbor")
+#levels.cases = c("PosLength", "SwitchSensor", "RouteSensor", "SwitchSet", "ConnectedSegments", "SemaphoreNeighbor")
+levels.cases = c("RouteSensor")
+
+scenario = "Repair"
 
 # draw plots
-benchmark.plot.by.case(times.plot, "Batch", modelsizes, levels.cases, "Read", "read phase")
-benchmark.plot.by.case(times.plot, "Batch", modelsizes, levels.cases, "Check", "check phase")
-benchmark.plot.by.case(times.plot, "Batch", modelsizes, levels.cases, "Read and Check", "read and check phase")
+benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Read", "read phase")
+benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Check", "check phase")
+benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Read and Check", "read and check phase")
 
+benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Transformation", "transformation phase")
+benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Recheck", "recheck phase")
+benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Transformation and Recheck", "transformation and recheck phase")
