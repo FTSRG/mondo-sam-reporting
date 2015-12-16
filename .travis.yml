@@ -10,3 +10,6 @@ script:
 - ./init.sh
 - ./report.sh
 - ls -al diagrams
+branches:
+  only:
+    - master
