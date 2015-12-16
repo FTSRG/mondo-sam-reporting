@@ -20,3 +20,4 @@ vignettes/*.pdf
 *.ods
 *.csv
 .Rproj.user
+Rplots.pdf
