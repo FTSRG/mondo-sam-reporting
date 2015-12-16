@@ -79,12 +79,13 @@ modelsizes = do.call(rbind, list(modelsize.batch, modelsize.inject, modelsize.re
 levels.cases = c("RouteSensor")
 
 scenario = "Repair"
+ncol = 1
 
 # draw plots
-benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Read", "read phase")
-benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Check", "check phase")
-benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Read and Check", "read and check phase")
+benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Read", "read phase", ncol)
+benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Check", "check phase", ncol)
+benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Read and Check", "read and check phase", ncol)
 
-benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Transformation", "transformation phase")
-benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Recheck", "recheck phase")
-benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Transformation and Recheck", "transformation and recheck phase")
+benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Transformation", "transformation phase", ncol)
+benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Recheck", "recheck phase", ncol)
+benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Transformation and Recheck", "transformation and recheck phase", ncol)
