@@ -11,13 +11,7 @@ library(plyr)
 
 results = read.csv("results.csv")
 
-matches = subset(results, Metric == "Matches" & Phase == "Check")
-
-tools = unique(matches$Tool)
-artifacts = unique(matches$Artifact)
-scenarios = unique(matches$Scenario)
-cases = unique(matches$Case)
-phases = unique(matches$Phase)
+matches = subset(results, Metric == "Matches")
 
 # Consistency
 # For all
@@ -28,22 +22,16 @@ phases = unique(matches$Phase)
 # a **tool** should return the same **value** between **runs**.
 
 df = matches
-for(tool in tools) {
-  for(scenario in scenarios) {
-    for(artifact in artifacts) {
-      for(phase in phases) {
-        for(case in cases) {
-          sdf = df[df$Scenario == scenario & df$Artifact == artifact & df$Phase == phase & df$Case == case & df$Tool == tool, ]
-          if (length(unique(sdf$Value)) > 1){
-            print(paste("Results for ",
-              "tool ", tool, ", ",
-              "artifact ", artifact, ", ",
-              "phase ", phase, ", ",
-              "case ", case, " ",
-              "are not consistent.", sep = ''))
-          }
-        }
-      }
-    }
-  }
-}
+head(df)
+unique.results = ddply(
+  .data = df,
+  .variables = c("Tool", "Scenario", "Artifact", "Phase", "Case", "Iteration"),
+  summarize,
+  CountUniqueResults = length(unique(Value)),
+  .progress = "text"
+)
+unique.results
+inconsistent.results = subset(unique.results, unique.results$CountUniqueResults != 1)
+
+print("In the following benchmark instances were inconsistent between runs")
+print(inconsistent.results)
