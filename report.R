@@ -14,6 +14,7 @@
 
 library(reshape2)
 library(plyr)
+library(R6)
 
 source("plot.R")
 
@@ -35,7 +36,6 @@ times.wide = dcast(times,
 # calculate aggregated values
 times.derived = times.wide
 times.derived$Read.and.Check = times.derived$Read + times.derived$Check
-times.derived$Transformation.and.Recheck = times.derived$Transformation + times.derived$Recheck
 
 # summarize for each value (along the **Iteration** attribute) using a columnwise function
 # there might be NAs as some phases (e.g. Read) are not executed repeatedly
@@ -62,7 +62,7 @@ times.aggregated.runs = subset(times.aggregated.runs, select=-c(Run))
 times.plot = melt(
   data = times.aggregated.runs,
   id.vars = c("Scenario", "Tool", "Case", "Artifact", "Metric"),
-  measure.vars = c("Read", "Check", "Read.and.Check", "Transformation", "Recheck", "Transformation.and.Recheck"),
+  measure.vars = c("Read", "Check", "Read.and.Check", "Transformation"),
   variable.name = "Phase",
   value.name = "Time"
 )
@@ -72,21 +72,24 @@ times.plot$Phase = gsub('\\.', ' ', times.plot$Phase)
 
 # modelsizes
 modelsize.batch  = data.frame(Scenario = "Batch",  Artifact = 2^(0:14), Triples = c("4.7k", "7.9k", "20.6k", "41k", "89.4k", "191.8k", "374.1k", "716.5k", "1.5M", "2.8M", "5.7M", "11.5M", "23M", "45.9M", "92.3M"))
-modelsize.inject = data.frame(Scenario = "Inject", Artifact = 2^(0:14), Triples = c("5k", "9.3k", "19.9k", "44.6k", "85.7k", "191.6k", "373.1k", "752.8k", "1.5M", "3M", "5.8M", "11.6M", "23.3M", "46.5M", "93M"))
-modelsize.repair = data.frame(Scenario = "Repair", Artifact = 2^(0:14), Triples = c("4.9k", "9.3k", "19.8k", "44.5k", "85.4k", "191.1k", "372.1k", "750.7k", "1.5M", "2.9M", "5.8M", "11.5M", "23.2M", "46.4M", "92.8M"))
-modelsizes = do.call(rbind, list(modelsize.batch, modelsize.inject, modelsize.repair))
+modelsizes = do.call(rbind, list(modelsize.batch))
 
-# levels for the facets in the plot
-levels.cases = c("PosLength", "SwitchSensor", "RouteSensor", "SwitchSet", "ConnectedSegments", "SemaphoreNeighbor")
-
-scenario = "Repair"
-facet_cols = 2
-legend_cols = 4
+scenario = "Batch"
+plot.format = PlotFormat$new(facet_cols = 2, legend_cols = 2, scale = "free_y")
 
 # draw plots
 #benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Read", "read phase", facet_cols, legend_cols)
-benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Check", "check phase", facet_cols, legend_cols)
+df = times.plot
+df = df[df$Scenario == scenario & df$Phase == "Check", ]
+benchmark.plot(df = df, artifacts = modelsizes, title = "Batch scenario, check phase", facet = "Case")
+               
+               
+
+
+
+
 #benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Read and Check", "read and check phase", facet_cols, legend_cols)
 #benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Transformation", "transformation phase", facet_cols, legend_cols)
 #benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Recheck", "recheck phase", facet_cols, legend_cols)
 #benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Transformation and Recheck", "transformation and recheck phase", facet_cols, legend_cols)
+
