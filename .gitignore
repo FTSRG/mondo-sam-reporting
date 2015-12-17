@@ -21,3 +21,5 @@ vignettes/*.pdf
 *.csv
 .Rproj.user
 Rplots.pdf
+
+*.html

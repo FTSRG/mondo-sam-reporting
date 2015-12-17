@@ -20,8 +20,8 @@ source("plot.R")
 results = read.csv("results.csv")
 
 # filtering for time values
-times = subset(results, Metric == "Time")
-#times = subset(times, Phase == "Read" | Phase == "Check")
+#times = subset(results, Metric == "Time")
+times = results
 
 # convert nanoseconds to seconds
 times$Value = times$Value / 10^9
@@ -83,10 +83,9 @@ facet_cols = 2
 legend_cols = 4
 
 # draw plots
-benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Read", "read phase", facet_cols, legend_cols)
+#benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Read", "read phase", facet_cols, legend_cols)
 benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Check", "check phase", facet_cols, legend_cols)
-benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Read and Check", "read and check phase", facet_cols, legend_cols)
-
-benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Transformation", "transformation phase", facet_cols, legend_cols)
-benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Recheck", "recheck phase", facet_cols, legend_cols)
-benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Transformation and Recheck", "transformation and recheck phase", facet_cols, legend_cols)
+#benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Read and Check", "read and check phase", facet_cols, legend_cols)
+#benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Transformation", "transformation phase", facet_cols, legend_cols)
+#benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Recheck", "recheck phase", facet_cols, legend_cols)
+#benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Transformation and Recheck", "transformation and recheck phase", facet_cols, legend_cols)
