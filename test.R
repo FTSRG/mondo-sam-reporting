@@ -34,7 +34,7 @@ for(tool in tools) {
       for(phase in phases) {
         for(case in cases) {
           sdf = df[df$Scenario == scenario & df$Artifact == artifact & df$Phase == phase & df$Case == case & df$Tool == tool, ]
-          if (length(unique(sdf$Value)) >= 1){
+          if (length(unique(sdf$Value)) > 1){
             print(paste("Results for ",
               "tool ", tool, ", ",
               "artifact ", artifact, ", ",
