@@ -20,8 +20,7 @@ source("plot.R")
 results = read.csv("results.csv")
 
 # filtering for time values
-#times = subset(results, Metric == "Time")
-times = results
+times = subset(results, Metric == "Time")
 
 # convert nanoseconds to seconds
 times$Value = times$Value / 10^9
@@ -43,7 +42,8 @@ times.derived$Transformation.and.Recheck = times.derived$Transformation + times.
 times.aggregated.iterations = ddply(
   .data = times.derived,
   .variables = c("Scenario", "Tool", "Run", "Case", "Artifact", "Metric"),
-  .fun = colwise(mean, na.rm = TRUE)
+  .fun = colwise(mean, na.rm = TRUE),
+  .progress = "text"
 )
 # drop the **Iteration** attribute
 times.aggregated.iterations = subset(times.aggregated.iterations, select=-c(Iteration))
@@ -52,7 +52,8 @@ times.aggregated.iterations = subset(times.aggregated.iterations, select=-c(Iter
 times.aggregated.runs = ddply(
   .data = times.aggregated.iterations,
   .variables = c("Scenario", "Tool", "Case", "Artifact", "Metric"),
-  .fun = colwise(median)
+  .fun = colwise(median),
+  .progress = "text"
 )
 # drop the **Run** attribute
 times.aggregated.runs = subset(times.aggregated.runs, select=-c(Run))
