@@ -99,10 +99,11 @@ benchmark.plot(df = df, title = "Transition scenario, transformation phase", fac
 matches = subset(results, Scenario == "Query" & Metric == "Matches" & Tool == "Original" & Run == 1)
 matches = subset(matches, select = c(Case, Artifact, Value))
 matches = arrange(matches,Case,Artifact)
-matches = rename(x = matches, replace = c("Case"="Query", "Artifact"="Model size", "Value"="Number of matches"))
-write.csv(x = matches, file = "matches.csv", quote = FALSE, row.names = FALSE)
 
-#matches.case = subset(matches, Case == "LogicalFunctionRealization")
-#matches.case
-#matches.case$Value
-
+matches.wide = dcast(
+  matches,
+  Case ~ Artifact,
+  value.var="Value"
+)
+matches.wide = rename(matches.wide, c("Case"="Query"))
+write.csv(x = matches.wide, file = "matches.csv", quote = F, row.names = F)
