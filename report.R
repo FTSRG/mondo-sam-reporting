@@ -35,10 +35,10 @@ times.wide = dcast(times,
 
 # calculate aggregated values
 times.derived = times.wide
-times.derived$Read.and.Check = times.derived$Read + times.derived$Check
+times.derived$Init.and.Check = times.derived$Init + times.derived$Check
 
 # summarize for each value (along the **Iteration** attribute) using a columnwise function
-# there might be NAs as some phases (e.g. Read) are not executed repeatedly
+# there might be NAs as some phases (e.g. Init) are not executed repeatedly
 times.aggregated.iterations = ddply(
   .data = times.derived,
   .variables = c("Scenario", "Tool", "Run", "Case", "Artifact", "Metric"),
@@ -62,7 +62,7 @@ times.aggregated.runs = subset(times.aggregated.runs, select=-c(Run))
 times.plot = melt(
   data = times.aggregated.runs,
   id.vars = c("Scenario", "Tool", "Case", "Artifact", "Metric"),
-  measure.vars = c("Read", "Check", "Read.and.Check", "Transformation"),
+  measure.vars = c("Init", "Check", "Init.and.Check", "Transformation"),
   variable.name = "Phase",
   value.name = "Time"
 )
@@ -71,25 +71,38 @@ times.plot = melt(
 times.plot$Phase = gsub('\\.', ' ', times.plot$Phase)
 
 # modelsizes
-modelsize.batch  = data.frame(Scenario = "Batch",  Artifact = 2^(0:14), Triples = c("4.7k", "7.9k", "20.6k", "41k", "89.4k", "191.8k", "374.1k", "716.5k", "1.5M", "2.8M", "5.7M", "11.5M", "23M", "45.9M", "92.3M"))
-modelsizes = do.call(rbind, list(modelsize.batch))
-
-scenario = "Batch"
-plot.format = PlotFormat$new(facet_cols = 2, legend_cols = 2, scale = "free_y")
 
 # draw plots
-#benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Read", "read phase", facet_cols, legend_cols)
-df = times.plot
-df = df[df$Scenario == scenario & df$Phase == "Check", ]
-benchmark.plot(df = df, artifacts = modelsizes, title = "Batch scenario, check phase", facet = "Case")
-               
-               
+tp = times.plot
+
+## Query scenario
+
+plot.format = PlotFormat$new(width=210, height=210, facet_cols=2, legend_cols=2)
+
+df = tp[tp$Scenario == "Query" & tp$Phase == "Init", ]
+benchmark.plot(df = df, title = "Query scenario, init phase", facet = "Case", plot.format = plot.format)
+
+df = tp[tp$Scenario == "Query" & tp$Phase == "Check", ]
+benchmark.plot(df = df, title = "Query scenario, check phase", facet = "Case", plot.format = plot.format)
+
+## Transition scenario
+
+plot.format = PlotFormat$new(width=110, height=110, legend_cols=2)
+
+df = tp[tp$Scenario == "Transition" & tp$Phase == "Init", ]
+benchmark.plot(df = df, title = "Transition scenario, init phase", facet = "Case", plot.format = plot.format)
+
+df = tp[tp$Scenario == "Transition" & tp$Phase == "Transformation", ]
+benchmark.plot(df = df, title = "Transition scenario, transformation phase", facet = "Case", plot.format = plot.format)
 
 
+matches = subset(results, Scenario == "Query" & Metric == "Matches" & Tool == "Original" & Run == 1)
+matches = subset(matches, select = c(Case, Artifact, Value))
+matches = arrange(matches,Case,Artifact)
+matches = rename(x = matches, replace = c("Case"="Query", "Artifact"="Model size", "Value"="Number of matches"))
+write.csv(x = matches, file = "matches.csv", quote = FALSE, row.names = FALSE)
 
-
-#benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Read and Check", "read and check phase", facet_cols, legend_cols)
-#benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Transformation", "transformation phase", facet_cols, legend_cols)
-#benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Recheck", "recheck phase", facet_cols, legend_cols)
-#benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Transformation and Recheck", "transformation and recheck phase", facet_cols, legend_cols)
+#matches.case = subset(matches, Case == "LogicalFunctionRealization")
+#matches.case
+#matches.case$Value
 

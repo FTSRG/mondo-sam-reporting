@@ -16,31 +16,29 @@ PlotFormat <- R6Class("PlotFormat",
                           if (!missing(scale)) self$scale = scale
                         }
                       )
+                      # TODO add font size, axis font size, sparser axes, ...
 )
 
-benchmark.plot = function(df, artifacts, title, facet) {
+# TODO add optional argument for axis labels
+
+benchmark.plot = function(df, title, facet, plot.format) {
   # for multicolumn layouts, we omit every second label on the x axis
-  if (facet_cols > 1) {
-    evens = seq(2, nrow(artifacts), by=2)
-    artifacts = artifacts[-evens, ]
-  }
-  
-  # x axis labels
-  #artifacts.scenario = artifacts[artifacts$Scenario == scenario, "Triples"]
-  #xbreaks = artifacts[artifacts$Scenario == scenario, "Artifact"]
-  #xlabels = paste(xbreaks, "\n", artifacts.scenario, sep = "")
+  #if (plot.format$facet_cols > 1) {
+  #  evens = seq(2, nrow(artifacts), by=2)
+  #  artifacts = artifacts[-evens, ]
+  #}
   
   # y axis labels
   ys = -10:10
   ybreaks = 10^ys
   ylabels = parse(text = paste("10^", ys, sep = ""))
 
-  plot.filename = gsub(" ", "-", title)
+  plot.filename = gsub("[ ,]", "-", title)
 
   facet = as.formula(paste("~", facet))
 
   p = ggplot(df) +
-    labs(title = title, x = "Model size\n#Triples", y = "Execution time [s]") +
+    labs(title = title, x = "Model size\n", y = "Execution time [s]") +
     geom_point(aes(x = as.factor(Artifact), y = Time, col = Tool, shape = Tool), size = 1.5) +
     geom_line(aes(x = as.factor(Artifact), y = Time, col = Tool, group = Tool), size = 0.5) +
     scale_shape_manual(values = seq(0,24)) +
