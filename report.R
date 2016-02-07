@@ -14,13 +14,75 @@
 
 library(reshape2)
 library(plyr)
+library(ggplot2)
 
-source("plot.R")
+####################################################################################################
 
-results = read.csv("results.csv")
+# plot size
+#width = 160
+#height = 220
+
+
+####################################################################################################
+
+benchmark.plot = function(df, scenario, artifacts, title, facet, scale, facet_cols, legend_cols, width = 210, height = 297) {
+  # for multicolumn layouts, we omit every second label on the x axis
+  if (facet_cols > 1) {
+    evens = seq(2, nrow(artifacts), by=2)
+    artifacts = artifacts[-evens, ]
+  }
+  
+  # x axis labels
+  artifacts.scenario = artifacts[artifacts$Scenario == scenario, "Triples"]
+  
+  xbreaks = artifacts[artifacts$Scenario == scenario, "Artifact"]
+  xlabels = paste(xbreaks, "\n", artifacts.scenario, sep = "")
+  
+  # y axis labels
+  #ys = -10:10
+  #ybreaks = 10^ys
+  #ylabels = parse(text = paste("10^", ys, sep = ""))
+  
+  plot.filename = gsub(" ", "-", title)
+  
+  facet = as.formula(paste("~", facet))
+  
+  p = ggplot(df) +
+    labs(title = paste(scenario, " scenario, ", title, sep = ""), x = "Model size\n#Triples", y = "Execution time [s]") +
+    geom_point(aes(x = as.factor(Artifact), y = Time, col = Tool, shape = Tool), size = 1.5) +
+    geom_line(aes(x = as.factor(Artifact), y = Time, col = Tool, group = Tool), size = 0.5) +
+    scale_shape_manual(values = seq(0,24)) +
+    scale_x_discrete(breaks = xbreaks, labels = xlabels) +
+    scale_y_log10(breaks = ybreaks, labels = ylabels) +
+    facet_wrap(facet, ncol = facet_cols, scale = scale) +
+    theme_bw() +
+    theme(legend.key = element_blank(), legend.title = element_blank(), legend.position = "bottom") +
+    guides(shape = guide_legend(ncol = legend_cols))
+  print(p)
+  
+  ggsave(file = paste("diagrams/", scenario, "-", plot.filename, ".pdf", sep = ""), width = width, height = height, units = "mm")
+}
+
+benchmark.plot.by.phase = function(df, scenario, artifacts, levels, case, title, facet_cols = 2, legend_cols = 2) {
+  df = df[df$Scenario == scenario & df$Case == case, ]
+  df$Phase = factor(df$Phase, levels = levels)
+  benchmark.plot(df, scenario, artifacts, title, "Phase", "free_y", facet_cols, legend_cols)
+}
+
+benchmark.plot.by.case = function(df, scenario, artifacts, levels, phase, title, facets_cols = 2, legend_cols = 2) {
+  df = df[df$Scenario == scenario & df$Phase == phase, ]
+  df$Case = factor(df$Case, levels = levels)
+  benchmark.plot(df, scenario, artifacts, title, "Case", "fixed", facet_cols, legend_cols)
+}
+
+####################################################################################################
+
+results = read.csv("../trainbenchmark/results/results.csv", header=FALSE)
+colnames(results) = c("Scenario", "Tool", "Run", "Case", "Artifact", "Phase", "Iteration", "Metric", "Value")
 
 # filtering for time values
 times = subset(results, Metric == "Time")
+#times$Iteration = 1
 
 # convert nanoseconds to seconds
 times$Value = times$Value / 10^9
@@ -79,14 +141,59 @@ modelsizes = do.call(rbind, list(modelsize.batch, modelsize.inject, modelsize.re
 # levels for the facets in the plot
 levels.cases = c("PosLength", "SwitchSensor", "RouteSensor", "SwitchSet", "ConnectedSegments", "SemaphoreNeighbor")
 
-scenario = "Repair"
+scenario = "Batch"
 facet_cols = 2
 legend_cols = 4
 
+# y axis labels
+longticks = c(F, F, F, F, F, F, F, F, T)
+shortticks = 2:10
+range = -6:2
+
+ooms = 10^range
+ylabels = parse(text = paste("10^", range, sep = ""))
+
+ybreaks = as.vector(shortticks %o% ooms)
+
+emptylabels=rep(c(""), each=8)
+longticklabels=paste("1e", range, sep="")
+
+ylabels=c()
+for (longticklabel in longticklabels) {
+  ylabels = c(ylabels, emptylabels, longticklabel)
+}
+ylabels
+ybreaks
+
+#ylabels = gsub("^0$", NA, ylabels)
+#ylabels = parse(text = paste("10^", range, sep = ""))
+#ylabels = gsub("^10\\^NA$", "", ylabels)
+#ylabels
+
+
+#show = c(F, F, F, F, F, F, F, F, T)
+#show = 
+#show 
+
+# disable scientific notation
+#options(scipen=999)
+
+#ybreaks = 10^ys
+#ylabels = parse(text = paste("10^", ybreaks, sep = ""))
+#ylabels
+#ylabels = as.character(ybreaks * show)
+
+benchmark.plot.by.case(times.plot, "Batch", modelsizes, levels.cases, "Read", "Read phase", facet_cols, legend_cols)
+
 # draw plots
-#benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Read", "read phase", facet_cols, legend_cols)
-benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Check", "check phase", facet_cols, legend_cols)
-#benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Read and Check", "read and check phase", facet_cols, legend_cols)
-#benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Transformation", "transformation phase", facet_cols, legend_cols)
-#benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Recheck", "recheck phase", facet_cols, legend_cols)
-#benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Transformation and Recheck", "transformation and recheck phase", facet_cols, legend_cols)
+for (scenario in c("Batch", "Inject")) {
+  benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Read", "Read phase", facet_cols, legend_cols)
+  benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Check", "Check phase", facet_cols, legend_cols)
+  #benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Read.and.Check", "Read and Check phase", facet_cols, legend_cols)
+}
+
+for (scenario in c("Inject")) {
+  benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Transformation", "Transformation phase", facet_cols, legend_cols)
+  benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Recheck", "Recheck phase", facet_cols, legend_cols)
+#  benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Transformation.and.Recheck", "Transformation and Recheck phase", facet_cols, legend_cols)
+}
