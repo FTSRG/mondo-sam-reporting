@@ -69,16 +69,18 @@ legend_cols = 4
 
 p = ggplot(df) +
   labs(title = "", x = "Model size\n#Triples", y = "Memory consumption [MB]") +
-  geom_point(aes(x = as.factor(Artifact), y = Value, col = Tool, shape = Tool), size = 1.5) +
   geom_line(aes(x = as.factor(Artifact), y = Value, col = Tool, group = Tool), size = 0.5) +
+  geom_point(aes(x = as.factor(Artifact), y = Value, col = Tool, shape = Tool), size = 1.5) +
+  geom_label_repel(data = toolnames, aes(x = as.factor(Artifact), y = Value, label = Tool,  col = Tool), size = 1.6, show.legend = F, label.padding = unit(2, "lines")) +
   scale_shape_manual(values = seq(0,24)) +
   #scale_x_discrete(breaks = xbreaks, labels = xlabels) +
   scale_y_log10() +#breaks = ybreaks, labels = ylabels) +
   facet_wrap(~ Case, ncol = 2, scale = "fixed") +
   theme_bw() +
   theme(legend.key = element_blank(), legend.title = element_blank(), legend.position = "bottom") +
-  geom_label_repel(data = toolnames, aes(x = as.factor(Artifact), y = Value, label = Tool,  col = Tool), size = 1.6) +
+  #theme(legend.key = element_blank(), legend.position = "bottom") +
   guides(shape = guide_legend(ncol = legend_cols))
+  
 print(p)
 
 
