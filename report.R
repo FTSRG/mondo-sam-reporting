@@ -77,11 +77,20 @@ benchmark.plot.by.case = function(df, scenario, artifacts, levels, phase, title,
 
 ####################################################################################################
 
-results = read.csv("../trainbenchmark/results/results.csv", header=FALSE)
+results = read.csv("../trainbenchmark/results/results2k.csv", header=FALSE)
 colnames(results) = c("Scenario", "Tool", "Run", "Case", "Artifact", "Phase", "Iteration", "Metric", "Value")
 
+d = dcast(results,
+      Scenario + Tool + Run + Case + Artifact + Iteration ~ Phase ~ Metric,
+      value.var = "Value")
+d
+
 # filtering for time values
+times
 times = subset(results, Metric == "Time")
+
+
+
 #times$Iteration = 1
 
 # convert nanoseconds to seconds
