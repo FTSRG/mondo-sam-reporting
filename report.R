@@ -79,19 +79,17 @@ benchmark.plot.by.case = function(df, scenario, artifacts, levels, phase, title,
 
 results = read.csv("../trainbenchmark/results/results2k.csv", header=FALSE)
 colnames(results) = c("Scenario", "Tool", "Run", "Case", "Artifact", "Phase", "Iteration", "Metric", "Value")
-
-d = dcast(results,
-      Scenario + Tool + Run + Case + Artifact + Iteration ~ Phase ~ Metric,
-      value.var = "Value")
-d
+levels(results$Phase) = c("Read", "Check", "Transformation", "Recheck")
 
 # filtering for time values
-times
 times = subset(results, Metric == "Time")
-
-
-
-#times$Iteration = 1
+times = subset(times, select = -c(Metric, Iteration))
+times = ddply(
+  .data = times,
+  .variables = c("Scenario", "Tool", "Run", "Case", "Artifact", "Phase"),
+  .fun = colwise(min),
+  .progress = "text"
+)
 
 # convert nanoseconds to seconds
 times$Value = times$Value / 10^9
@@ -100,8 +98,8 @@ times$Tool = gsub('_', ' ', times$Tool)
 
 # transform long table to wide table
 times.wide = dcast(times,
-                   Scenario + Tool + Run + Case + Artifact + Iteration + Metric ~ Phase,
-                   value.var = "Value")
+                   Scenario + Tool + Run + Case + Artifact ~ Phase,
+                   value.var = "Value", drop = F)
 
 # calculate aggregated values
 times.derived = times.wide
