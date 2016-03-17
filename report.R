@@ -33,17 +33,12 @@ results = load()
 
 ####################################################################################################
 
-preprocess = function(results) {
+process.times = function(results) {
   # filtering for time values
   times = subset(results, Metric == "Time")
-  times = subset(times, select = -c(Metric))
-  times = ddply(
-    .data = times,
-    .variables = c("Scenario", "Tool", "Run", "Case", "Artifact", "Phase"),
-    .fun = colwise(min),
-    .progress = "text"
-  )
-  
+  # drop the malformed Iteration attribute
+  times = subset(times, select = -c(Metric, Iteration))
+
   # convert nanoseconds to seconds
   times$Value = times$Value / 10^9
   # replace underscore with space in tool names
@@ -52,8 +47,10 @@ preprocess = function(results) {
   # transform long table to wide table
   times.wide = dcast(times,
                      Scenario + Tool + Run + Case + Artifact ~ Phase,
-                     value.var = "Value", drop = F)
-  
+                     value.var = "Value", drop = F,
+                     fun.aggregate = mean
+                     )
+
   # calculate aggregated values
   times.derived = times.wide
   times.derived$Read.and.Check = times.derived$Read + times.derived$Check
@@ -61,18 +58,19 @@ preprocess = function(results) {
   
   # summarize for each value (along the **Iteration** attribute) using a columnwise function
   # there might be NAs as some phases (e.g. Read) are not executed repeatedly
-  times.aggregated.iterations = ddply(
-    .data = times.derived,
-    .variables = c("Scenario", "Tool", "Run", "Case", "Artifact"),
-    .fun = colwise(mean, na.rm = TRUE),
-    .progress = "text"
-  )
+  #times.aggregated.iterations = ddply(
+    #.data = times.derived,
+    #.variables = c("Scenario", "Tool", "Run", "Case", "Artifact"),
+    #.fun = colwise(mean, na.rm = TRUE),
+    #.progress = "text"
+  #)
+  
   # drop the **Iteration** attribute
   #times.aggregated.iterations = subset(times.aggregated.iterations, select = -c(Iteration))
   
   # summarize for each value (along the **Run** attribute) using a columnwise function
   times.aggregated.runs = ddply(
-    .data = times.aggregated.iterations,
+    .data = times.derived,
     .variables = c("Scenario", "Tool", "Case", "Artifact"),
     .fun = colwise(median),
     .progress = "text"
@@ -98,7 +96,47 @@ preprocess = function(results) {
 
 ####################################################################################################
 
-times.plot = preprocess(results)
+times.plot = process.times(results)
+
+####################################################################################################
+
+process.memories = function(results) {
+  # filter on the MaxMemory metric, throw away unused columns
+  memories = subset(results, Metric == "MaxMemory")
+  memories = subset(memories, select = -c(Phase, Iteration, Metric))
+  memories = unique(memories)
+  
+  # get the minimum values for the memory consumption
+  minimum.memories = ddply(
+    .data = memories,
+    .variables = c("Scenario", "Tool", "Case", "Artifact", "Run"),
+    .fun = colwise(min),
+    .progress = "text"
+  )
+  
+  # drop results from less than 5 runs
+  memories.runs = ddply(
+    .data = minimum.memories,
+    .variables = c("Scenario", "Tool", "Case", "Artifact", "Value"),
+    .fun = colwise(length),
+    .progress = "text"
+  )
+  memories.finished = memories.runs[memories.runs$Run == 5, ]
+  memories.finished = subset(memories.finished, select = -c(Run))
+  
+  # extract the tool names for the plots labels
+  toolnames = ddply(
+    .data = memories.finished,
+    .variables = c("Scenario", "Tool", "Case"),
+    .fun = colwise(max),
+    .progress = "text"
+  )
+  list(memories = memories, toolnames = toolnames)
+}
+
+####################################################################################################
+
+memories.plot = process.memories(results)
 
 ####################################################################################################
 
@@ -109,7 +147,7 @@ yaxis = function() {
   # y axis labels
   longticks = c(F, F, F, F, F, F, F, F, T)
   shortticks = 2:10
-  range = -6:2
+  range = -6:4
   
   ooms = 10^range
   
@@ -127,7 +165,7 @@ yaxis = function() {
 
 ####################################################################################################
 
-benchmark.plot = function(df, scenario, artifacts, title, facet, scale, facet_cols = 2, legend_cols = 4, width = 210, height = 297) {
+benchmark.plot = function(df, scenario, artifacts, title, facet, scale, metric, toolnames = NULL, facet_cols = 2, legend_cols = 4, width = 210, height = 297) { #toolnames
   # for multicolumn layouts, we omit every second label on the x axis
   if (facet_cols > 1) {
     evens = seq(2, nrow(artifacts), by=2)
@@ -136,8 +174,7 @@ benchmark.plot = function(df, scenario, artifacts, title, facet, scale, facet_co
   
   # only keep the records for the current scenario
   df = df[df$Scenario == scenario, ]
-  print(df)
-  
+
   # x axis labels
   artifacts.scenario = artifacts[artifacts$Scenario == scenario, "Triples"]
   
@@ -153,9 +190,16 @@ benchmark.plot = function(df, scenario, artifacts, title, facet, scale, facet_co
   facet = as.formula(paste("~", facet))
 
   p = ggplot(df) +
+    aes(x = as.factor(Artifact)) +
     labs(title = paste(scenario, " scenario, ", title, sep = ""), x = "Model size\n#Triples", y = "Execution time [s]") +
-    geom_point(aes(x = as.factor(Artifact), y = Time, col = Tool, shape = Tool), size = 1.5) +
-    geom_line(aes(x = as.factor(Artifact), y = Time, col = Tool, group = Tool), size = 0.5) +
+    geom_point(aes_string(y = metric, col = "Tool", shape = "Tool"), size = 1.5) +
+    geom_line(aes_string(y = metric, col = "Tool", group = "Tool"), size = 0.5)
+  
+  if (!is.null(toolnames)) {
+    p = p + geom_label_repel(data = toolnames, aes(x = as.factor(Artifact), y = Value, label = Tool,  col = Tool), size = 1.6, show.legend = F, label.padding = unit(0.12, "lines"))
+  }
+  
+  p = p +
     scale_shape_manual(values = seq(0,24)) +
     scale_x_discrete(breaks = xbreaks, labels = xlabels) +
     scale_y_log10(breaks = ybreaks, labels = ylabels) +
@@ -178,57 +222,11 @@ modelsize.repair = data.frame(Scenario = "Repair", Artifact = 2^(0:14), Triples 
 modelsizes = do.call(rbind, list(modelsize.batch, modelsize.inject, modelsize.repair))
 
 scenario = "Batch"
-
 phase = "Read"
 
-df = times.plot
-df = df[df$Phase == phase, ]
-benchmark.plot(df = df, scenario = scenario, artifacts = modelsizes, title = "", facet = "Case", scale = "fixed")
+df = times.plot[times.plot$Phase == phase, ]
+benchmark.plot(df = df, scenario = scenario, artifacts = modelsizes, metric = "Time", title = "time", facet = "Case", scale = "fixed")
 
+#benchmark.plot(df = memories.plot$memories, scenario = scenario, artifacts = modelsizes, "Value", title = "Memories", facet = "Case", scale = "fixed", toolnames = memories.plot$toolnames)
 
-
-#ylabels = gsub("^0$", NA, ylabels)
-#ylabels = parse(text = paste("10^", range, sep = ""))
-#ylabels = gsub("^10\\^NA$", "", ylabels)
-#ylabels
-
-
-#show = c(F, F, F, F, F, F, F, F, T)
-#show = 
-#show 
-
-# disable scientific notation
-#options(scipen=999)
-
-#ybreaks = 10^ys
-#ylabels = parse(text = paste("10^", ybreaks, sep = ""))
-#ylabels
-#ylabels = as.character(ybreaks * show)
-
-#benchmark.plot.by.case(times.plot, "Batch", modelsizes, "Read", "Read phase")
-#
-#benchmark.plot.by.phase = function(df, scenario, artifacts, case, title, facet_cols = 2, legend_cols = 4) {
-  #df = df[df$Case == case, ]
-  #benchmark.plot(df, scenario, artifacts, title, "Phase", "free_y", facet_cols, legend_cols)
-#}
-#benchmark.plot.by.case = function(df, scenario, artifacts, phase, title, facets_cols = 2, legend_cols = 4) {
-  #df = df[df$Phase == phase, ]
-  #benchmark.plot(df, scenario, artifacts, title, "Case", "fixed", facet_cols, legend_cols)
-#}
-
-#benchmark.plot = function(df, scenario, artifacts, title, facet, scale, facet_cols = 2, legend_cols = 4, width = 210, height = 297) {
-
-
-
-# draw plots
-#for (scenario in c("Batch", "Inject")) {
-  #benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Read", "Read phase", facet_cols, legend_cols)
-  #benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Check", "Check phase", facet_cols, legend_cols)
-  #benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Read.and.Check", "Read and Check phase", facet_cols, legend_cols)
-#}
-
-#for (scenario in c("Inject")) {
-  #benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Transformation", "Transformation phase", facet_cols, legend_cols)
-  #benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Recheck", "Recheck phase", facet_cols, legend_cols)
-#  benchmark.plot.by.case(times.plot, scenario, modelsizes, levels.cases, "Transformation.and.Recheck", "Transformation and Recheck phase", facet_cols, legend_cols)
-#}
+head(memories.plot$memories)
