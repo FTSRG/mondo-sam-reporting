@@ -237,7 +237,6 @@ phase = "Read"
 
 df = times.plot[times.plot$Phase == phase, ]
 benchmark.plot(df = df, scenario = scenario, artifacts = modelsizes, metric = "Time", title = "Time", facet = "Case", scale = "fixed")
-
 benchmark.plot(df = memories.plot$memories, scenario = scenario, artifacts = modelsizes, metric = "Memory", title = "Memories", facet = "Case", scale = "fixed", toolnames = memories.plot$toolnames)
 
 head(memories.plot$memories)
