@@ -145,26 +145,10 @@ benchmark.plot = function(df, scenario, artifacts, title, facet, scale, facet_co
   xlabels = paste(xbreaks, "\n", artifacts.scenario, sep = "")
   
   # y axis labels
-  facet_cols = 2
-  legend_cols = 4
-  
-  # y axis labels
-  longticks = c(F, F, F, F, F, F, F, F, T)
-  shortticks = 2:10
-  range = -6:2
-  
-  ooms = 10^range
-  
-  ybreaks = as.vector(shortticks %o% ooms)
-  
-  emptylabels = rep(c(""), each=8)
-  longticklabels = paste("1e", range, sep="")
-  
-  ylabels = c()
-  for (longticklabel in longticklabels) {
-    ylabels = c(ylabels, emptylabels, longticklabel)
-  }
-  
+  yaxis = yaxis()
+  ybreaks = yaxis$ybreaks
+  ylabels = yaxis$ylabels
+
   plot.filename = gsub(" ", "-", title)
   facet = as.formula(paste("~", facet))
 
