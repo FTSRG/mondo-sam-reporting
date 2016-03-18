@@ -34,11 +34,16 @@ load = function(results.file) {
   colnames(results) = c("Scenario", "Tool", "Run", "Case", "Artifact", "Phase", "Iteration", "Metric", "Value")
   
   # order phases according to their appearance
-  levels(results$Phase) = c("Read", "Check", "Transformation", "Recheck")
-  
+  #levels(results$Phase) = c("Read", "Check", "Transformation", "Recheck")#, "Read.and.Check", "Transformation.and.Recheck")
+  #levels(results$Phase) = c("Read", "Transformation", "Check", "Recheck", "Read.and.Check", "Transformation.and.Recheck")
+
+  results$Phase = factor(results$Phase, levels = c("Read", "Transformation", "Check", "Recheck", "Read.and.Check", "Transformation.and.Recheck"))
+    
   # order queries according to their complexity
   results$Case = factor(results$Case, levels=c("PosLength", "SwitchSensor", "RouteSensor", "SwitchSet", "ConnectedSegments", "SemaphoreNeighbor", "RouteSensor-ConnectedSegments-PosLength-SemaphoreNeighbor-SwitchSensor-SwitchSet"))
+
   
+    
   # replace underscore with space in tool names
   results$Tool = gsub('_', ' ', results$Tool)
   
@@ -110,9 +115,13 @@ process.times = function(results) {
   )
   
   # remove the . characters from the phasename
+  #times.plot$Phase = factor(times.plot$Phase, levels = c("Read", "Transformation", "Check", "Recheck", "Read.and.Check", "Transformation.and.Recheck"))
   times.plot$Phase = gsub('\\.', ' ', times.plot$Phase)
+  times.plot$Phase = factor(times.plot$Phase, levels = c("Read", "Transformation", "Check", "Recheck", "Read and Check", "Transformation and Recheck"))
   print(head(times.plot))
   print("y")
+  
+  
   return(times.plot)
 }
 
@@ -273,7 +282,6 @@ print(p)
 # Memory
 ####################################################################################################
 
-
 benchmark.plot(
   df = memories.plot$memories, 
   scenario = "Batch", 
@@ -283,7 +291,6 @@ benchmark.plot(
   facet = "Case", 
   scale = "fixed", 
   toolnames = memories.plot$toolnames)
-
 
 ####################################################################################################
 # Summary heatmaps
