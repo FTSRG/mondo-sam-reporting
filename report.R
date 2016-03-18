@@ -15,18 +15,29 @@
 library(reshape2)
 library(plyr)
 library(ggplot2)
+library(ggrepel)
 
 ####################################################################################################
 
-load = function() {
-  results = read.csv("../trainbenchmark/results/results.csv", header=FALSE)
+# modelsizes
+#modelsize.batch  = data.frame(Scenario = "Batch",  Artifact = 2^(0:14), Triples = c("4.7k", "7.9k", "20.6k", "41k", "89.4k", "191.8k", "374.1k", "716.5k", "1.5M", "2.8M", "5.7M", "11.5M", "23M", "45.9M", "92.3M"))
+modelsize.batch  = data.frame(Scenario = "Batch",  Artifact = 2^(0:14), Triples = c("5k", "8k", "21k", "41k", "89k", "192k", "374k", "717k", "1.5M", "2.8M", "5.7M", "11.5M", "23M", "45.9M", "92.3M"))
+modelsize.inject = data.frame(Scenario = "Inject", Artifact = 2^(0:14), Triples = c("5k", "9.3k", "19.9k", "44.6k", "85.7k", "191.6k", "373.1k", "752.8k", "1.5M", "3M", "5.8M", "11.6M", "23.3M", "46.5M", "93M"))
+modelsize.repair = data.frame(Scenario = "Repair", Artifact = 2^(0:14), Triples = c("4.9k", "9.3k", "19.8k", "44.5k", "85.4k", "191.1k", "372.1k", "750.7k", "1.5M", "2.9M", "5.8M", "11.5M", "23.2M", "46.4M", "92.8M"))
+modelsizes = do.call(rbind, list(modelsize.batch, modelsize.inject, modelsize.repair))
+
+####################################################################################################
+
+load = function(results.file) {
+  #results.file = "../trainbenchmark/results/results-mix.csv"
+  results = read.csv(results.file, header=FALSE)
   colnames(results) = c("Scenario", "Tool", "Run", "Case", "Artifact", "Phase", "Iteration", "Metric", "Value")
   
   # order phases according to their appearance
   levels(results$Phase) = c("Read", "Check", "Transformation", "Recheck")
   
   # order queries according to their complexity
-  results$Case = factor(results$Case, levels=c("PosLength", "SwitchSensor", "RouteSensor", "SwitchSet", "ConnectedSegments", "SemaphoreNeighbor"))
+  results$Case = factor(results$Case, levels=c("PosLength", "SwitchSensor", "RouteSensor", "SwitchSet", "ConnectedSegments", "SemaphoreNeighbor", "RouteSensor-ConnectedSegments-PosLength-SemaphoreNeighbor-SwitchSensor-SwitchSet"))
   
   # replace underscore with space in tool names
   results$Tool = gsub('_', ' ', results$Tool)
@@ -36,11 +47,14 @@ load = function() {
 
 ####################################################################################################
 
-results = load()
+results.individual = load("../trainbenchmark/results/results.csv")
+results.mix = load("../trainbenchmark/results/results-mix.csv")
 
 ####################################################################################################
 
 process.times = function(results) {
+  #print("x")
+  #results = results.mix
   # filtering for time values
   times = subset(results, Metric == "Time")
   # drop the malformed Iteration attribute
@@ -53,10 +67,10 @@ process.times = function(results) {
   times.wide = dcast(times,
                      Scenario + Tool + Run + Case + Artifact ~ Phase,
                      value.var = "Value",
-                     drop = F,
+                     #drop = F,
                      fun.aggregate = mean
-                     )
-
+                    )
+  
   # calculate aggregated values
   times.derived = times.wide
   times.derived$Read.and.Check = times.derived$Read + times.derived$Check
@@ -97,12 +111,19 @@ process.times = function(results) {
   
   # remove the . characters from the phasename
   times.plot$Phase = gsub('\\.', ' ', times.plot$Phase)
-  times.plot
+  print(head(times.plot))
+  print("y")
+  return(times.plot)
 }
 
 ####################################################################################################
 
-times.plot = process.times(results)
+times.individual = process.times(results.individual)
+times.mix = process.times(results.mix)
+
+#results.mix
+#times.mix = NULL
+#head(times.mix)
 
 ####################################################################################################
 
@@ -144,7 +165,7 @@ process.memories = function(results) {
 
 ####################################################################################################
 
-memories.plot = process.memories(results)
+memories.plot = process.memories(results.individual)
 
 ####################################################################################################
 
@@ -173,7 +194,7 @@ yaxis = function() {
 benchmark.plot = function(df, scenario, artifacts, title, facet, scale, metric, toolnames = NULL, facet_cols = 2, legend_cols = 4, width = 210, height = 297) { #toolnames
   # for multicolumn layouts, we omit every second label on the x axis
   if (facet_cols > 1) {
-    evens = seq(2, nrow(artifacts), by=2)
+    evens = c(seq(4, nrow(artifacts), by=2))
     artifacts = artifacts[-evens, ]
   }
   
@@ -203,8 +224,9 @@ benchmark.plot = function(df, scenario, artifacts, title, facet, scale, metric, 
   p = ggplot(df) +
     aes(x = as.factor(Artifact)) +
     labs(title = paste(scenario, " scenario, ", title, sep = ""), x = "Model size\n#Triples", y = ycaption) +
-    geom_point(aes_string(y = metric, col = "Tool", shape = "Tool"), size = 1.5) +
+    geom_point(aes_string(y = metric, col = "Tool", shape = "Tool"), size = 2.5) +
     geom_line(aes_string(y = metric, col = "Tool", group = "Tool"), size = 0.5)
+    #geom_line(aes_string(y = metric, col = "Tool", shape = "Tool"), size = 0.5)
   
   if (!is.null(toolnames)) {
     p = p + geom_label_repel(data = toolnames, aes_string(y = metric, label = "Tool",  col = "Tool"), size = 1.6, show.legend = F, label.padding = unit(0.12, "lines"))
@@ -224,19 +246,67 @@ benchmark.plot = function(df, scenario, artifacts, title, facet, scale, metric, 
 }
 
 ####################################################################################################
+# Execution times
+####################################################################################################
 
 
-# modelsizes
-modelsize.batch  = data.frame(Scenario = "Batch",  Artifact = 2^(0:14), Triples = c("4.7k", "7.9k", "20.6k", "41k", "89.4k", "191.8k", "374.1k", "716.5k", "1.5M", "2.8M", "5.7M", "11.5M", "23M", "45.9M", "92.3M"))
-modelsize.inject = data.frame(Scenario = "Inject", Artifact = 2^(0:14), Triples = c("5k", "9.3k", "19.9k", "44.6k", "85.7k", "191.6k", "373.1k", "752.8k", "1.5M", "3M", "5.8M", "11.6M", "23.3M", "46.5M", "93M"))
-modelsize.repair = data.frame(Scenario = "Repair", Artifact = 2^(0:14), Triples = c("4.9k", "9.3k", "19.8k", "44.5k", "85.4k", "191.1k", "372.1k", "750.7k", "1.5M", "2.9M", "5.8M", "11.5M", "23.2M", "46.4M", "92.8M"))
-modelsizes = do.call(rbind, list(modelsize.batch, modelsize.inject, modelsize.repair))
-
-scenario = "Batch"
 phase = "Read"
+df = times.individual[times.individual$Phase == phase, ]
+benchmark.plot(df = df, scenario = "Batch", artifacts = modelsizes, metric = "Time", title = "Time", facet = "Case", scale = "fixed")
 
-df = times.plot[times.plot$Phase == phase, ]
-benchmark.plot(df = df, scenario = scenario, artifacts = modelsizes, metric = "Time", title = "Time", facet = "Case", scale = "fixed")
-benchmark.plot(df = memories.plot$memories, scenario = scenario, artifacts = modelsizes, metric = "Memory", title = "Memories", facet = "Case", scale = "fixed", toolnames = memories.plot$toolnames)
+scenario = "Inject"
+benchmark.plot(df = times.mix, scenario = scenario, artifacts = modelsizes, metric = "Time", title = "Time", facet = "Phase", scale = "fixed")
 
-head(memories.plot$memories)
+scenario = "Repair"
+benchmark.plot(df = times.mix, scenario = scenario, artifacts = modelsizes, metric = "Time", title = "Time", facet = "Phase", scale = "fixed")
+
+
+p = ggplot(times.mix) +
+  aes(x = as.factor(Artifact)) +
+  #geom_point(aes_string(y = "Time", col = "Tool", shape = "Tool"), size = 2.5) +
+  geom_line(aes_string(y = "Time", col = "Tool", group = "Tool"), size = 0.5)
+  #geom_line(aes_string(y = metric, col = "Tool", shape = "Tool"), size = 0.5)
+print(p)
+
+
+####################################################################################################
+# Memory
+####################################################################################################
+
+
+benchmark.plot(
+  df = memories.plot$memories, 
+  scenario = "Batch", 
+  artifacts = modelsizes, 
+  metric = "Memory", 
+  title = "Memories", 
+  facet = "Case", 
+  scale = "fixed", 
+  toolnames = memories.plot$toolnames)
+
+
+####################################################################################################
+# Summary heatmaps
+####################################################################################################
+
+a1 = 16
+a2 = 256
+
+head(times)
+
+times$ArtifactDesc[times$Artifact <= a1] = "small"
+times$ArtifactDesc[times$Artifact > a1] = "large"
+times$Artifact = times$ArtifactDesc
+
+times$TimeDesc[times$Time <= 0.1] = "fast"
+times$TimeDesc[times$Time > 0.1] = "slow"
+times$Time = times$TimeDesc
+
+head(times)
+
+#ggplot(times) +
+  #stat_bin2d(aes(x = times$Artifact, y = times$Time, fill = ..count..)) +
+  #scale_fill_gradient(low = "white", high = "black")
+
+####################################################################################################
+
