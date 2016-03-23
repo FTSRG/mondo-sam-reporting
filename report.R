@@ -28,38 +28,27 @@ modelsizes = do.call(rbind, list(modelsize.batch, modelsize.inject, modelsize.re
 
 ####################################################################################################
 
-load = function(results.file) {
-  #results.file = "../trainbenchmark/results/results-mix.csv"
+load = function(results.file, cases) {
   results = read.csv(results.file, header=FALSE)
   colnames(results) = c("Scenario", "Tool", "Run", "Case", "Artifact", "Phase", "Iteration", "Metric", "Value")
   
-  # order phases according to their appearance
-  #levels(results$Phase) = c("Read", "Check", "Transformation", "Recheck")#, "Read.and.Check", "Transformation.and.Recheck")
+  # make the phases a factor with a fixed set of values to help dcasting
+  levels(results$Phase) = c("Read", "Check", "Transformation", "Recheck")#, "Read.and.Check", "Transformation.and.Recheck")
   #levels(results$Phase) = c("Read", "Transformation", "Check", "Recheck", "Read.and.Check", "Transformation.and.Recheck")
-
-  results$Phase = factor(results$Phase, levels = c("Read", "Transformation", "Check", "Recheck", "Read.and.Check", "Transformation.and.Recheck"))
+  #results$Phase = factor(results$Phase, levels = c("Read", "Transformation", "Check", "Recheck", "Read.and.Check", "Transformation.and.Recheck"))
     
   # order queries according to their complexity
-  results$Case = factor(results$Case, levels=c("PosLength", "SwitchSensor", "RouteSensor", "SwitchSet", "ConnectedSegments", "SemaphoreNeighbor", "RouteSensor-ConnectedSegments-PosLength-SemaphoreNeighbor-SwitchSensor-SwitchSet"))
+  results$Case = factor(results$Case, levels = cases)
 
-  
-    
   # replace underscore with space in tool names
   results$Tool = gsub('_', ' ', results$Tool)
   
-  results
+  return(results)
 }
 
 ####################################################################################################
 
-results.individual = load("../trainbenchmark/results/results.csv")
-results.mix = load("../trainbenchmark/results/results-mix.csv")
-
-####################################################################################################
-
-process.times = function(results) {
-  #print("x")
-  #results = results.mix
+process.times = function(results, drop) {
   # filtering for time values
   times = subset(results, Metric == "Time")
   # drop the malformed Iteration attribute
@@ -72,7 +61,7 @@ process.times = function(results) {
   times.wide = dcast(times,
                      Scenario + Tool + Run + Case + Artifact ~ Phase,
                      value.var = "Value",
-                     #drop = F,
+                     drop = drop,
                      fun.aggregate = mean
                     )
   
@@ -117,22 +106,10 @@ process.times = function(results) {
   # remove the . characters from the phasename
   #times.plot$Phase = factor(times.plot$Phase, levels = c("Read", "Transformation", "Check", "Recheck", "Read.and.Check", "Transformation.and.Recheck"))
   times.plot$Phase = gsub('\\.', ' ', times.plot$Phase)
-  times.plot$Phase = factor(times.plot$Phase, levels = c("Read", "Transformation", "Check", "Recheck", "Read and Check", "Transformation and Recheck"))
-  print(head(times.plot))
-  print("y")
-  
+  #times.plot$Phase = factor(times.plot$Phase, levels = c("Read", "Transformation", "Check", "Recheck", "Read and Check", "Transformation and Recheck"))
   
   return(times.plot)
 }
-
-####################################################################################################
-
-times.individual = process.times(results.individual)
-times.mix = process.times(results.mix)
-
-#results.mix
-#times.mix = NULL
-#head(times.mix)
 
 ####################################################################################################
 
@@ -171,10 +148,6 @@ process.memories = function(results) {
   )
   list(memories = memories.finished, toolnames = toolnames)
 }
-
-####################################################################################################
-
-memories.plot = process.memories(results.individual)
 
 ####################################################################################################
 
@@ -233,7 +206,7 @@ benchmark.plot = function(df, scenario, artifacts, title, facet, scale, metric, 
   p = ggplot(df) +
     aes(x = as.factor(Artifact)) +
     labs(title = paste(scenario, " scenario, ", title, sep = ""), x = "Model size\n#Triples", y = ycaption) +
-    geom_point(aes_string(y = metric, col = "Tool", shape = "Tool"), size = 2.5) +
+    geom_point(aes_string(y = metric, col = "Tool", shape = "Tool"), size = 2.0) +
     geom_line(aes_string(y = metric, col = "Tool", group = "Tool"), size = 0.5)
     #geom_line(aes_string(y = metric, col = "Tool", shape = "Tool"), size = 0.5)
   
@@ -253,67 +226,4 @@ benchmark.plot = function(df, scenario, artifacts, title, facet, scale, metric, 
   
   ggsave(file = paste("diagrams/", scenario, "-", plot.filename, ".pdf", sep = ""), width = width, height = height, units = "mm")
 }
-
-####################################################################################################
-# Execution times
-####################################################################################################
-
-
-phase = "Read"
-df = times.individual[times.individual$Phase == phase, ]
-benchmark.plot(df = df, scenario = "Batch", artifacts = modelsizes, metric = "Time", title = "Time", facet = "Case", scale = "fixed")
-
-scenario = "Inject"
-benchmark.plot(df = times.mix, scenario = scenario, artifacts = modelsizes, metric = "Time", title = "Time", facet = "Phase", scale = "fixed")
-
-scenario = "Repair"
-benchmark.plot(df = times.mix, scenario = scenario, artifacts = modelsizes, metric = "Time", title = "Time", facet = "Phase", scale = "fixed")
-
-
-p = ggplot(times.mix) +
-  aes(x = as.factor(Artifact)) +
-  #geom_point(aes_string(y = "Time", col = "Tool", shape = "Tool"), size = 2.5) +
-  geom_line(aes_string(y = "Time", col = "Tool", group = "Tool"), size = 0.5)
-  #geom_line(aes_string(y = metric, col = "Tool", shape = "Tool"), size = 0.5)
-print(p)
-
-
-####################################################################################################
-# Memory
-####################################################################################################
-
-benchmark.plot(
-  df = memories.plot$memories, 
-  scenario = "Batch", 
-  artifacts = modelsizes, 
-  metric = "Memory", 
-  title = "Memories", 
-  facet = "Case", 
-  scale = "fixed", 
-  toolnames = memories.plot$toolnames)
-
-####################################################################################################
-# Summary heatmaps
-####################################################################################################
-
-a1 = 16
-a2 = 256
-
-head(times)
-
-times$ArtifactDesc[times$Artifact <= a1] = "small"
-times$ArtifactDesc[times$Artifact > a1] = "large"
-times$Artifact = times$ArtifactDesc
-
-times$TimeDesc[times$Time <= 0.1] = "fast"
-times$TimeDesc[times$Time > 0.1] = "slow"
-times$Time = times$TimeDesc
-
-head(times)
-
-#ggplot(times) +
-  #stat_bin2d(aes(x = times$Artifact, y = times$Time, fill = ..count..)) +
-  #scale_fill_gradient(low = "white", high = "black")
-
-####################################################################################################
 
